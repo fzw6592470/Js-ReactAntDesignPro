@@ -1,7 +1,7 @@
-const checkTelphoneNumber = (num) => {
-  let reg = /^1(3[0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|8[0-9]|9[89])\d{8}$/;
+const checkTelphoneNumber = num => {
+  const reg = /^1(3[0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|8[0-9]|9[89])\d{8}$/;
   return reg.test(num);
-}
+};
 
 /**
  * @param
@@ -10,17 +10,13 @@ const checkTelphoneNumber = (num) => {
  * @return boolean
  */
 const checkPasswordNumber = (type, num) => {
-  var reg;
-  if(type == 1) {
+  let reg;
+  if (type === 1) {
     reg = /^[0-9]{6}$/;
   } else {
     reg = /^\d{6,12}$/;
   }
   return reg.test(num);
-}
+};
 
-export {
-  checkTelphoneNumber,
-  checkPasswordNumber,
-}
-
+export { checkTelphoneNumber, checkPasswordNumber };

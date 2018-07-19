@@ -1,4 +1,9 @@
-import { queryMemberList, addMemberList, deleteMemberList, updateMemberList } from '../services/memberList';
+import {
+  queryMemberList,
+  addMemberList,
+  deleteMemberList,
+  updateMemberList,
+} from '../services/memberList';
 
 export default {
   // 在common->route中定义路由时[]中的内容
@@ -51,16 +56,14 @@ export default {
     queryList(state, action) {
       return {
         ...state,
-        data: action.payload
+        data: action.payload,
       };
     },
     saveList(state, action) {
       return {
         ...state,
-        data: action.payload
+        data: action.payload,
       };
     },
   },
 };
-
-

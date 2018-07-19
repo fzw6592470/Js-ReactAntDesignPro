@@ -1,14 +1,13 @@
 import { getTransactionDetails } from '../services/transaction';
 
 export default {
-
   namespace: 'transDetails',
 
   state: {
     data: {
       list: [],
       pagination: {},
-    }
+    },
   },
 
   effects: {
@@ -22,14 +21,12 @@ export default {
     },
   },
 
-
   reducers: {
     saveList(state, action) {
       return {
         ...state,
         data: action.payload,
-      }
+      };
     },
   },
-
 };

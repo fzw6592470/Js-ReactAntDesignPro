@@ -1,14 +1,13 @@
 import { getTransactionRecord } from '../services/transaction';
 
 export default {
-
   namespace: 'transRecord',
 
   state: {
     data: {
       list: [],
       pagination: {},
-    }
+    },
   },
 
   effects: {
@@ -27,8 +26,7 @@ export default {
       return {
         ...state,
         data: action.payload,
-      }
+      };
     },
-  }
-
+  },
 };

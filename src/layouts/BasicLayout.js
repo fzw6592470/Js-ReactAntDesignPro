@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Layout, Icon, message } from 'antd';
 import DocumentTitle from 'react-document-title';
@@ -6,56 +6,37 @@ import { connect } from 'dva';
 import { Route, Redirect, Switch, routerRedux } from 'dva/router';
 import { ContainerQuery } from 'react-container-query';
 import classNames from 'classnames';
-import pathToRegexp from 'path-to-regexp';
-import { enquireScreen, unenquireScreen } from 'enquire-js';
+import { enquireScreen } from 'enquire-js';
 import GlobalHeader from '../components/GlobalHeader';
 import GlobalFooter from '../components/GlobalFooter';
 import SiderMenu from '../components/SiderMenu';
 import NotFound from '../routes/Exception/404';
 import { getRoutes } from '../utils/utils';
 import Authorized from '../utils/Authorized';
-import { getMenuData } from '../common/menu';
 import logo from '../assets/logo.svg';
 
-const { Content, Header, Footer } = Layout;
-const { AuthorizedRoute, check } = Authorized;
+import AppMenu from '../components/utils/AppMenu';
+import { hasPermission } from '../utils/authority';
+const { Content } = Layout;
+const { AuthorizedRoute } = Authorized;
 
 /**
  * 根据菜单取得重定向地址.
  */
 const redirectData = [];
-const getRedirect = item => {
+const getRedirect = (item) => {
   if (item && item.children) {
     if (item.children[0] && item.children[0].path) {
       redirectData.push({
-        from: `${item.path}`,
-        to: `${item.children[0].path}`,
+        from: `/${item.path}`,
+        to: `/${item.children[0].path}`,
       });
-      item.children.forEach(children => {
+      item.children.forEach((children) => {
         getRedirect(children);
       });
     }
   }
-};
-getMenuData().forEach(getRedirect);
 
-/**
- * 获取面包屑映射
- * @param {Object} menuData 菜单配置
- * @param {Object} routerData 路由配置
- */
-const getBreadcrumbNameMap = (menuData, routerData) => {
-  const result = {};
-  const childResult = {};
-  for (const i of menuData) {
-    if (!routerData[i.path]) {
-      result[i.path] = i;
-    }
-    if (i.children) {
-      Object.assign(childResult, getBreadcrumbNameMap(i.children, routerData));
-    }
-  }
-  return Object.assign({}, routerData, result, childResult);
 };
 
 const query = {
@@ -80,7 +61,7 @@ const query = {
 };
 
 let isMobile;
-enquireScreen(b => {
+enquireScreen((b) => {
   isMobile = b;
 });
 
@@ -88,7 +69,7 @@ class BasicLayout extends React.PureComponent {
   static childContextTypes = {
     location: PropTypes.object,
     breadcrumbNameMap: PropTypes.object,
-  };
+  }
   state = {
     isMobile,
   };
@@ -96,11 +77,11 @@ class BasicLayout extends React.PureComponent {
     const { location, routerData } = this.props;
     return {
       location,
-      breadcrumbNameMap: getBreadcrumbNameMap(getMenuData(), routerData),
+      breadcrumbNameMap: routerData,
     };
   }
   componentDidMount() {
-    this.enquireHandler = enquireScreen(mobile => {
+    enquireScreen((mobile) => {
       this.setState({
         isMobile: mobile,
       });
@@ -109,22 +90,12 @@ class BasicLayout extends React.PureComponent {
       type: 'user/fetchCurrent',
     });
   }
-  componentWillUnmount() {
-    unenquireScreen(this.enquireHandler);
-  }
   getPageTitle() {
     const { routerData, location } = this.props;
     const { pathname } = location;
-    let title = 'Genvict';
-    let currRouterData = null;
-    // match params path
-    Object.keys(routerData).forEach(key => {
-      if (pathToRegexp(key).test(pathname)) {
-        currRouterData = routerData[key];
-      }
-    });
-    if (currRouterData && currRouterData.name) {
-      title = `${currRouterData.name} - Genvict`;
+    let title = 'Ant Design Pro';
+    if (routerData[pathname] && routerData[pathname].name) {
+      title = `${routerData[pathname].name} - Ant Design Pro`;
     }
     return title;
   }
@@ -139,28 +110,23 @@ class BasicLayout extends React.PureComponent {
       urlParams.searchParams.delete('redirect');
       window.history.replaceState(null, 'redirect', urlParams.href);
     } else {
-      const { routerData } = this.props;
-      // get the first authorized route path in routerData
-      const authorizedPath = Object.keys(routerData).find(
-        item => check(routerData[item].authority, item) && item !== '/'
-      );
-      return authorizedPath;
+      return '/dashboard/analysis';
     }
     return redirect;
-  };
-  handleMenuCollapse = collapsed => {
+  }
+  handleMenuCollapse = (collapsed) => {
     this.props.dispatch({
       type: 'global/changeLayoutCollapsed',
       payload: collapsed,
     });
-  };
-  handleNoticeClear = type => {
+  }
+  handleNoticeClear = (type) => {
     message.success(`清空了${type}`);
     this.props.dispatch({
       type: 'global/clearNotices',
       payload: type,
     });
-  };
+  }
   handleMenuClick = ({ key }) => {
     if (key === 'triggerError') {
       this.props.dispatch(routerRedux.push('/exception/trigger'));
@@ -171,23 +137,17 @@ class BasicLayout extends React.PureComponent {
         type: 'login/logout',
       });
     }
-  };
-  handleNoticeVisibleChange = visible => {
+  }
+  handleNoticeVisibleChange = (visible) => {
     if (visible) {
       this.props.dispatch({
         type: 'global/fetchNotices',
       });
     }
-  };
+  }
   render() {
     const {
-      currentUser,
-      collapsed,
-      fetchingNotices,
-      notices,
-      routerData,
-      match,
-      location,
+      currentUser, collapsed, fetchingNotices, notices, routerData, match, location, menus,
     } = this.props;
     const bashRedirect = this.getBashRedirect();
     const layout = (
@@ -198,14 +158,13 @@ class BasicLayout extends React.PureComponent {
           // If you do not have the Authorized parameter
           // you will be forced to jump to the 403 interface without permission
           Authorized={Authorized}
-          menuData={getMenuData()}
+          menuData={menus}
           collapsed={collapsed}
           location={location}
           isMobile={this.state.isMobile}
           onCollapse={this.handleMenuCollapse}
         />
         <Layout>
-          <Header style={{ padding: 0 }}>
             <GlobalHeader
               logo={logo}
               currentUser={currentUser}
@@ -218,55 +177,54 @@ class BasicLayout extends React.PureComponent {
               onMenuClick={this.handleMenuClick}
               onNoticeVisibleChange={this.handleNoticeVisibleChange}
             />
-          </Header>
           <Content style={{ margin: '24px 24px 0', height: '100%' }}>
             <Switch>
-              {redirectData.map(item => (
+              {
+                redirectData.map(item =>
                 <Redirect key={item.from} exact from={item.from} to={item.to} />
-              ))}
-              {getRoutes(match.path, routerData).map(item => (
+                )
+              }
+              {
+                getRoutes(match.path, routerData).map(item =>
+                  (
                 <AuthorizedRoute
                   key={item.key}
                   path={item.path}
                   component={item.component}
                   exact={item.exact}
-                  authority={item.authority}
+                      authority={() => hasPermission(item.identity)}
                   redirectPath="/exception/403"
                 />
-              ))}
+                  )
+                )
+              }
               <Redirect exact from="/" to={bashRedirect} />
               <Route render={NotFound} />
             </Switch>
           </Content>
-          <Footer style={{ padding: 0 }}>
             <GlobalFooter
-              links={[
-                {
+            links={[{
                   key: 'Pro 首页',
                   title: 'Pro 首页',
                   href: 'http://pro.ant.design',
                   blankTarget: true,
-                },
-                {
+            }, {
                   key: 'github',
                   title: <Icon type="github" />,
                   href: 'https://github.com/ant-design/ant-design-pro',
                   blankTarget: true,
-                },
-                {
+            }, {
                   key: 'Ant Design',
                   title: 'Ant Design',
                   href: 'http://ant.design',
                   blankTarget: true,
-                },
-              ]}
+            }]}
               copyright={
-                <Fragment>
+              <div>
                   Copyright <Icon type="copyright" /> 2018 蚂蚁金服体验技术部出品
-                </Fragment>
+              </div>
               }
             />
-          </Footer>
         </Layout>
       </Layout>
     );
@@ -286,4 +244,5 @@ export default connect(({ user, global, loading }) => ({
   collapsed: global.collapsed,
   fetchingNotices: loading.effects['global/fetchNotices'],
   notices: global.notices,
-}))(BasicLayout);
+  routerConfig: global.routerConfig,
+}))(AppMenu(BasicLayout));

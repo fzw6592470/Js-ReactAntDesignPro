@@ -124,7 +124,6 @@ export function postRule(req, res, u, b) {
     },
   };
 
-  console.log(result);
   if (res && res.json) {
     res.json(result);
   } else {

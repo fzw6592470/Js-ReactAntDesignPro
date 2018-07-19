@@ -9,8 +9,8 @@ for (let i = 0; i < 46; i += 1) {
     no: `TradeCode ${i}`,
     realName: '曲丽丽',
     address: '这是一段描述',
-    mobNo: '138'+Math.floor(Math.random() * 100000000),
-    status: [1,2,3][ i% 3],
+    mobNo: `138${Math.floor(Math.random() * 100000000)}`,
+    status: [1, 2, 3][i % 3],
     birthday: new Date(`2017-07-${Math.floor(i / 2) + 1}`),
     registerTime: new Date(`2017-07-${Math.floor(i / 2) + 1}`),
     type: '普通',
@@ -81,56 +81,69 @@ export function getMemberList(req, res, u) {
 
 export function operateMemberList(req, res, u, b) {
   let url = u;
-  if( !url || Object.prototype.toString.call(url) !== ['object String']) {
-    url = req.url;
+  if (!url || Object.prototype.toString.call(url) !== ['object String']) {
+    url = req.url; // eslint-disable-line
   }
-  console.log(req);
-  let body = (b && b.body) || req.body;
-  console.log(body);
-  let { method, no, key, realName, address, mobNo,status,birthday,type,registerType,nickname,email,password,gender } = body;
+  const body = (b && b.body) || req.body;
+  const {
+    method,
+    no,
+    key,
+    realName,
+    address,
+    mobNo,
+    status,
+    birthday,
+    type,
+    registerType,
+    nickname,
+    email,
+    password,
+    gender,
+  } = body;
+
+  const i = Math.ceil(Math.random() * 10000);
   switch (method) {
     case 'delete':
       tableListDataSource = tableListDataSource.filter(item => no.indexOf(item.no) === -1);
       break;
     case 'add':
-      const i = Math.ceil(Math.random() * 10000);
       tableListDataSource.unshift({
         key: i,
         disabled: false,
         no: `TradeCode ${i}`,
-        realName: realName,
-        address: address,
-        mobNo: mobNo,
-        status: status,
-        birthday: birthday,
-        type: type,
-        registerType: registerType,
-        nickname: nickname,
-        email: email,
-        password: password,
-        gender: gender,
+        realName,
+        address,
+        mobNo,
+        status,
+        birthday,
+        type,
+        registerType,
+        nickname,
+        email,
+        password,
+        gender,
       });
-
       break;
     case 'update':
-      tableListDataSource.map((item,index) => {
-        if(item.no == no) {
-          let list = {
-            key: key,
+      tableListDataSource.forEach((item, index) => {
+        if (item.no === no) {
+          const list = {
+            key,
             disabled: false,
-            no: no,
-            realName: realName,
-            address: address,
-            mobNo: mobNo,
-            status: status,
-            birthday: birthday,
-            type: type,
-            registerType: registerType,
-            nickname: nickname,
-            email: email,
-            password: password,
-            gender: gender,
-          }
+            no,
+            realName,
+            address,
+            mobNo,
+            status,
+            birthday,
+            type,
+            registerType,
+            nickname,
+            email,
+            password,
+            gender,
+          };
           tableListDataSource.splice(index, 1, list);
         }
       });
@@ -142,14 +155,14 @@ export function operateMemberList(req, res, u, b) {
   const result = {
     list: tableListDataSource,
     pagination: {
-      total: tableListDataSource.length
-    }
-  }
+      total: tableListDataSource.length,
+    },
+  };
 
-//  console.log(result);
-  if(res && res.json){
+  //  console.log(result);
+  if (res && res.json) {
     res.json(result);
-  }else{
+  } else {
     return result;
   }
 }

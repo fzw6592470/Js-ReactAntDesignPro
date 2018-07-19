@@ -1,17 +1,16 @@
 import { queryWalletList, chargeWalletFee } from '../services/wallet';
 
 export default {
-
   namespace: 'wallet',
 
   state: {
     data: {
       list: [],
       pageination: {},
-    }
+    },
   },
 
-  effects :{
+  effects: {
     *fetch({ payload }, { call, put }) {
       const response = yield call(queryWalletList, payload);
 
@@ -34,15 +33,14 @@ export default {
     saveList(state, action) {
       return {
         ...state,
-        data: action.payload
-      }
+        data: action.payload,
+      };
     },
     chargeWallet(state, action) {
       return {
         ...state,
-        data: action.payload
-      }
+        data: action.payload,
+      };
     },
-  }
-
-}
+  },
+};

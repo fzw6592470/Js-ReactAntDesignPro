@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
 import {
@@ -17,15 +17,13 @@ import {
   Modal,
   message,
   Badge,
-  Divider,
 } from 'antd';
+import ImageWrapper from 'components/ImageWrapper';
 import StandardTable from 'components/StandardTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import ImageWrapper from 'components/ImageWrapper';
 import { checkTelphoneNumber, checkPasswordNumber } from '../../utils/formValidate';
 
 import styles from '../List/TableList.less';
-import memberStyles from './MemberList.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -37,51 +35,49 @@ const statusMap = ['default', 'enable', 'disable'];
 const status = ['关闭', '启用', '禁用'];
 
 const CreateForm = Form.create()(props => {
-  const { modalVisible, form, handleAdd, handleUpdate, handleModalVisible, selectedRows  } = props;
+  const { modalVisible, form, handleAdd, handleUpdate, handleModalVisible, selectedRows } = props;
   const { getFieldDecorator } = form;
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       form.resetFields();
-      if(selectedRows.length > 0){
+      if (selectedRows.length > 0) {
         handleUpdate(fieldsValue);
-      }else{
+      } else {
         handleAdd(fieldsValue);
       }
-      console.log(fieldsValue);
     });
   };
 
   const checkPhone = (rule, value, callback) => {
-    console.log(value);
     if (checkTelphoneNumber(value)) {
       callback();
       return;
     }
     callback('请输入正确的11位手机号码!');
-  }
+  };
 
   const checkPassword = (rule, value, callback) => {
-    if(checkPasswordNumber(1, value)) {
+    if (checkPasswordNumber(1, value)) {
       callback();
       return;
     }
     callback('请输入正确的6位数字密码!');
-  }
+  };
 
   const formItemLayout = {
-   labelCol: {
-     xs: { span: 24 },
-     sm: { span: 8 },
-   },
-   wrapperCol: {
-     xs: { span: 24 },
-     sm: { span: 16 },
-   },
+    labelCol: {
+      xs: { span: 24 },
+      sm: { span: 8 },
+    },
+    wrapperCol: {
+      xs: { span: 24 },
+      sm: { span: 16 },
+    },
   };
   return (
     <Modal
-      title={selectedRows.length>0?"修改会员":"新增会员"}
+      title={selectedRows.length > 0 ? '修改会员' : '新增会员'}
       visible={modalVisible}
       onOk={okHandle}
       onCancel={() => handleModalVisible()}
@@ -90,24 +86,37 @@ const CreateForm = Form.create()(props => {
         <Row gutter={{ md: 12, lg: 24, xl: 48 }}>
           <Col md={12} sm={24}>
             <FormItem label="手机号" {...formItemLayout}>
-              {getFieldDecorator('mobNo', { initialValue: selectedRows.length>0?selectedRows[0].mobNo:"", rules: [{ validator: checkPhone },{ required: true, message: '请填写您的手机号!' },]  })(<Input placeholder="请输入账号" maxLength="11" />)}
+              {getFieldDecorator('mobNo', {
+                initialValue: selectedRows.length > 0 ? selectedRows[0].mobNo : '',
+                rules: [
+                  { validator: checkPhone },
+                  { required: true, message: '请填写您的手机号!' },
+                ],
+              })(<Input placeholder="请输入账号" maxLength="11" />)}
             </FormItem>
           </Col>
           <Col md={12} sm={24}>
             <FormItem label="密码" {...formItemLayout}>
-              {getFieldDecorator('password',{ initialValue: selectedRows.length>0?selectedRows[0].password:"", rules: [{ validator: checkPassword }] })(<Input placeholder="请输入密码" maxLength='6' />)}
+              {getFieldDecorator('password', {
+                initialValue: selectedRows.length > 0 ? selectedRows[0].password : '',
+                rules: [{ validator: checkPassword }],
+              })(<Input placeholder="请输入密码" maxLength="6" />)}
             </FormItem>
           </Col>
         </Row>
         <Row gutter={{ md: 12, lg: 24, xl: 48 }}>
           <Col md={12} sm={24}>
             <FormItem label="姓名" {...formItemLayout}>
-              {getFieldDecorator('realName', { initialValue: selectedRows.length>0?selectedRows[0].realName:"" })(<Input placeholder="请输入姓名" />)}
+              {getFieldDecorator('realName', {
+                initialValue: selectedRows.length > 0 ? selectedRows[0].realName : '',
+              })(<Input placeholder="请输入姓名" />)}
             </FormItem>
           </Col>
           <Col md={12} sm={24}>
             <FormItem label="性别" {...formItemLayout}>
-              {getFieldDecorator('gender', { initialValue: selectedRows.length>0?selectedRows[0].gender:"1" })(
+              {getFieldDecorator('gender', {
+                initialValue: selectedRows.length > 0 ? selectedRows[0].gender : '1',
+              })(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="1">男</Option>
                   <Option value="0">女</Option>
@@ -119,33 +128,44 @@ const CreateForm = Form.create()(props => {
         <Row gutter={{ md: 12, lg: 24, xl: 48 }}>
           <Col md={12} sm={24}>
             <FormItem label="地址" {...formItemLayout}>
-              {getFieldDecorator('address', { initialValue: selectedRows.length>0?selectedRows[0].address:"" })(<Input placeholder="请输入地址" />)}
+              {getFieldDecorator('address', {
+                initialValue: selectedRows.length > 0 ? selectedRows[0].address : '',
+              })(<Input placeholder="请输入地址" />)}
             </FormItem>
           </Col>
           <Col md={12} sm={24}>
             <FormItem label="邮箱" {...formItemLayout}>
-              {getFieldDecorator('email', { initialValue: selectedRows.length>0?selectedRows[0].email:"" })(<Input placeholder="请输入邮箱" />)}
+              {getFieldDecorator('email', {
+                initialValue: selectedRows.length > 0 ? selectedRows[0].email : '',
+              })(<Input placeholder="请输入邮箱" />)}
             </FormItem>
           </Col>
         </Row>
         <Row gutter={{ md: 12, lg: 24, xl: 48 }}>
           <Col md={12} sm={24}>
             <FormItem label="昵称" {...formItemLayout}>
-              {getFieldDecorator('nickname', { initialValue: selectedRows.length>0?selectedRows[0].nickname:"" })(<Input placeholder="请输入昵称" />)}
+              {getFieldDecorator('nickname', {
+                initialValue: selectedRows.length > 0 ? selectedRows[0].nickname : '',
+              })(<Input placeholder="请输入昵称" />)}
             </FormItem>
           </Col>
           <Col md={12} sm={24}>
             <FormItem label="生日" {...formItemLayout}>
-              {getFieldDecorator('birthday', { initialValue: moment(selectedRows.length>0?selectedRows[0].birthday:"", 'YYYY/MM/DD') })(
-                <DatePicker style={{ width: '100%' }} placeholder="请输入出生日期" />
-              )}
+              {getFieldDecorator('birthday', {
+                initialValue: moment(
+                  selectedRows.length > 0 ? selectedRows[0].birthday : '',
+                  'YYYY/MM/DD'
+                ),
+              })(<DatePicker style={{ width: '100%' }} placeholder="请输入出生日期" />)}
             </FormItem>
           </Col>
         </Row>
         <Row gutter={{ md: 12, lg: 24, xl: 48 }}>
           <Col md={12} sm={24}>
             <FormItem label="会员类型" {...formItemLayout}>
-              {getFieldDecorator('type', { initialValue: selectedRows.length>0?selectedRows[0].type:"" })(
+              {getFieldDecorator('type', {
+                initialValue: selectedRows.length > 0 ? selectedRows[0].type : '',
+              })(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="0">个人用户</Option>
                   <Option value="1">集团用户</Option>
@@ -155,28 +175,38 @@ const CreateForm = Form.create()(props => {
           </Col>
           <Col md={12} sm={24}>
             <FormItem label="注册类型" {...formItemLayout}>
-              {getFieldDecorator('registerType', { initialValue: selectedRows.length>0?selectedRows[0].registerType:"平台注册" })(<Input  />)}
+              {getFieldDecorator('registerType', {
+                initialValue: selectedRows.length > 0 ? selectedRows[0].registerType : '平台注册',
+              })(<Input />)}
             </FormItem>
           </Col>
         </Row>
         <Row gutter={{ md: 12, lg: 24, xl: 48 }}>
           <Col md={12} sm={24}>
             <FormItem label="状态" {...formItemLayout}>
-              {getFieldDecorator('status', { initialValue: selectedRows.length>0?selectedRows[0].status:"有效" })(<Input />)}
+              {getFieldDecorator('status', {
+                initialValue: selectedRows.length > 0 ? selectedRows[0].status : '有效',
+              })(<Input />)}
             </FormItem>
           </Col>
           <Col md={12} sm={24}>
             <FormItem {...formItemLayout} label="设备状态">
-              {getFieldDecorator('deviceStatus', { initialValue: selectedRows.length>0?selectedRows[0].deviceStatus:"1" })(
-                <Select  style={{ width: '100%' }}>
+              {getFieldDecorator('deviceStatus', {
+                initialValue: selectedRows.length > 0 ? selectedRows[0].deviceStatus : '1',
+              })(
+                <Select style={{ width: '100%' }}>
                   <Option value="1">未激活</Option>
                 </Select>
               )}
             </FormItem>
           </Col>
         </Row>
-        {getFieldDecorator('key',{ initialValue: selectedRows.length>0?selectedRows[0].key:""})(<Input type="hidden" />)}
-        {getFieldDecorator('no',{ initialValue: selectedRows.length>0?selectedRows[0].no:""})(<Input type="hidden" />)}
+        {getFieldDecorator('key', {
+          initialValue: selectedRows.length > 0 ? selectedRows[0].key : '',
+        })(<Input type="hidden" />)}
+        {getFieldDecorator('no', {
+          initialValue: selectedRows.length > 0 ? selectedRows[0].no : '',
+        })(<Input type="hidden" />)}
       </Form>
     </Modal>
   );
@@ -267,9 +297,9 @@ export default class MemberList extends PureComponent {
         });
         break;
       case 'update':
-        if( selectedRows.length > 1 ) {
-          message.warning("您只能选择一条需要修改的记录.");
-        }else{
+        if (selectedRows.length > 1) {
+          message.warning('您只能选择一条需要修改的记录.');
+        } else {
           this.handleModalVisible(true);
         }
         break;
@@ -470,14 +500,13 @@ export default class MemberList extends PureComponent {
   }
 
   renderForm() {
-    //return this.state.expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
     return this.renderSimpleForm();
   }
 
   render() {
     const { memberList, loading } = this.props;
     const { selectedRows, modalVisible } = this.state;
-    const { data } =  memberList ;
+    const { data } = memberList;
 
     const columns = [
       {
@@ -491,11 +520,6 @@ export default class MemberList extends PureComponent {
       {
         title: '性别',
         dataIndex: 'gender',
-        //sorter: true,
-        //align: 'right',
-        //render: val => `${val} 万`,
-        // mark to display a total number
-        //needTotal: true,
       },
       {
         title: '状态',
@@ -528,13 +552,6 @@ export default class MemberList extends PureComponent {
       {
         title: '地址',
         dataIndex: 'address',
-        //render: () => (
-        //  <Fragment>
-        //    <a href="">配置</a>
-        //    <Divider type="vertical" />
-        //    <a href="">订阅警报</a>
-        //  </Fragment>
-        //),
       },
       {
         title: '邮箱',
@@ -610,8 +627,11 @@ export default class MemberList extends PureComponent {
             />
           </div>
         </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} selectedRows={selectedRows}  />
-        <ImageWrapper src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png" desc="示意图" />
+        <CreateForm {...parentMethods} modalVisible={modalVisible} selectedRows={selectedRows} />
+        <ImageWrapper
+          src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png"
+          desc="示意图"
+        />
       </PageHeaderLayout>
     );
   }

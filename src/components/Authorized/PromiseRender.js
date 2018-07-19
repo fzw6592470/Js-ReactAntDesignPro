@@ -28,10 +28,10 @@ export default class PromiseRender extends React.PureComponent {
         });
       });
   }
-  // Determine whether the incoming component has been instantiated
-  // AuthorizedRoute is already instantiated
-  // Authorized  render is already instantiated, children is no instantiated
-  // Secured is not instantiated
+  // 确定传入组件是否已实例化。
+  // AuthorizedRoute已经实例化
+  // 已授权的呈现已经实例化，未实例化孩子。
+  // 未实例化安全的
   checkIsInstantiation = target => {
     if (!React.isValidElement(target)) {
       return target;

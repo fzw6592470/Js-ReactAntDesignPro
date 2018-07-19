@@ -13,26 +13,9 @@ import WaterWave from './WaterWave';
 import TagCloud from './TagCloud';
 import TimelineChart from './TimelineChart';
 
-const yuan = val => `¥ ${numeral(val).format('0,0')}`;
-
-const Charts = {
-  yuan,
-  Bar,
-  Pie,
-  Gauge,
-  Radar,
-  MiniBar,
-  MiniArea,
-  MiniProgress,
-  ChartCard,
-  Field,
-  WaterWave,
-  TagCloud,
-  TimelineChart,
-};
+const yuan = val => `&yen; ${numeral(val).format('0,0')}`;
 
 export {
-  Charts as default,
   yuan,
   Bar,
   Pie,

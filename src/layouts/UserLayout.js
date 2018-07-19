@@ -7,6 +7,7 @@ import styles from './UserLayout.less';
 import logo from '../assets/logo.svg';
 import { getRoutes } from '../utils/utils';
 
+import AppNoMenu from '../components/utils/AppNoMenu';
 const links = [
   {
     key: 'help',
@@ -75,4 +76,4 @@ class UserLayout extends React.PureComponent {
   }
 }
 
-export default UserLayout;
+export default AppNoMenu(UserLayout);

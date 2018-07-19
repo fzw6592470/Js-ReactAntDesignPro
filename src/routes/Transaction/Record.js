@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
 import {
@@ -14,15 +14,10 @@ import {
   Menu,
   InputNumber,
   DatePicker,
-  Modal,
-  message,
-  Badge,
-  Divider,
 } from 'antd';
+import ImageWrapper from 'components/ImageWrapper';
 import StandardTable from 'components/StandardTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import ImageWrapper from 'components/ImageWrapper';
-import { checkTelphoneNumber, checkPasswordNumber } from '../../utils/formValidate';
 
 import styles from '../List/TableList.less';
 
@@ -41,7 +36,6 @@ const getValue = obj =>
 @Form.create()
 export default class Record extends PureComponent {
   state = {
-    modalVisible: false,
     expandForm: false,
     selectedRows: [],
     formValues: {},
@@ -57,7 +51,6 @@ export default class Record extends PureComponent {
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch } = this.props;
     const { formValues } = this.state;
-    console.log(formValues);
 
     const filters = Object.keys(filtersArg).reduce((obj, key) => {
       const newObj = { ...obj };
@@ -138,7 +131,7 @@ export default class Record extends PureComponent {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      let fieldsValues = fieldsValue;
+      const fieldsValues = fieldsValue;
       const startDate = fieldsValue.date[0].format('YYYY-MM-DD HH:mm:ss');
       const endDate = fieldsValue.date[1].format('YYYY-MM-DD HH:mm:ss');
       fieldsValues.startDate = startDate;
@@ -146,11 +139,9 @@ export default class Record extends PureComponent {
       delete fieldsValues.date;
 
       const values = {
-        //...fieldsValue,
         ...fieldsValues,
         updatedAt: fieldsValues.updatedAt && fieldsValues.updatedAt.valueOf(),
       };
-      console.log(values);
 
       this.setState({
         formValues: values,
@@ -275,14 +266,13 @@ export default class Record extends PureComponent {
   }
 
   renderForm() {
-    //return this.state.expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
     return this.renderSimpleForm();
   }
 
   render() {
     const { transRecord, loading } = this.props;
-    const { selectedRows, modalVisible } = this.state;
-    const { data } =  transRecord ;
+    const { selectedRows } = this.state;
+    const { data } = transRecord;
 
     const columns = [
       {
@@ -297,10 +287,6 @@ export default class Record extends PureComponent {
       {
         title: '应付(元)',
         dataIndex: 'amount',
-        //sorter: true,
-        //align: 'right',
-        // mark to display a total number
-        //needTotal: true,
       },
       {
         title: '已付(元)',
@@ -309,18 +295,10 @@ export default class Record extends PureComponent {
       {
         title: '减免(元)',
         dataIndex: 'free',
-        //sorter: true,
       },
       {
         title: '抵用(元)',
         dataIndex: 'cancelAmount',
-        //render: () => (
-        //  <Fragment>
-        //    <a href="">配置</a>
-        //    <Divider type="vertical" />
-        //    <a href="">订阅警报</a>
-        //  </Fragment>
-        //),
       },
     ];
 
@@ -356,7 +334,10 @@ export default class Record extends PureComponent {
             />
           </div>
         </Card>
-        <ImageWrapper src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png" desc="示意图" />
+        <ImageWrapper
+          src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png"
+          desc="示意图"
+        />
       </PageHeaderLayout>
     );
   }

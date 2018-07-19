@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
 import {
@@ -14,15 +14,11 @@ import {
   Menu,
   InputNumber,
   DatePicker,
-  Modal,
-  message,
   Badge,
-  Divider,
 } from 'antd';
+import ImageWrapper from 'components/ImageWrapper';
 import StandardTable from 'components/StandardTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import ImageWrapper from 'components/ImageWrapper';
-import { checkTelphoneNumber, checkPasswordNumber } from '../../utils/formValidate';
 
 import styles from '../List/TableList.less';
 
@@ -43,7 +39,6 @@ const status = ['关闭', '启用', '禁用'];
 @Form.create()
 export default class Details extends PureComponent {
   state = {
-    modalVisible: false,
     expandForm: false,
     selectedRows: [],
     formValues: {},
@@ -155,12 +150,6 @@ export default class Details extends PureComponent {
     });
   };
 
-  handleModalVisible = flag => {
-    this.setState({
-      modalVisible: !!flag,
-    });
-  };
-
   renderSimpleForm() {
     const { getFieldDecorator } = this.props.form;
     return (
@@ -267,14 +256,13 @@ export default class Details extends PureComponent {
   }
 
   renderForm() {
-    //return this.state.expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
     return this.renderSimpleForm();
   }
 
   render() {
     const { transDetails, loading } = this.props;
-    const { selectedRows, modalVisible } = this.state;
-    const { data } =  transDetails ;
+    const { selectedRows } = this.state;
+    const { data } = transDetails;
 
     const columns = [
       {
@@ -292,11 +280,6 @@ export default class Details extends PureComponent {
       {
         title: '订单类型',
         dataIndex: 'orderType',
-        //sorter: true,
-        //align: 'right',
-        //render: val => `${val} 万`,
-        // mark to display a total number
-        //needTotal: true,
       },
       {
         title: '订单状态',
@@ -333,13 +316,6 @@ export default class Details extends PureComponent {
       {
         title: '支付方式',
         dataIndex: 'payType',
-        //render: () => (
-        //  <Fragment>
-        //    <a href="">配置</a>
-        //    <Divider type="vertical" />
-        //    <a href="">订阅警报</a>
-        //  </Fragment>
-        //),
       },
       {
         title: '下单时间',
@@ -353,12 +329,6 @@ export default class Details extends PureComponent {
         <Menu.Item key="remove">删除</Menu.Item>
       </Menu>
     );
-
-    const parentMethods = {
-      handleAdd: this.handleAdd,
-      handleUpdate: this.handleUpdate,
-      handleModalVisible: this.handleModalVisible,
-    };
 
     return (
       <PageHeaderLayout title="查询表格">
@@ -386,7 +356,10 @@ export default class Details extends PureComponent {
             />
           </div>
         </Card>
-        <ImageWrapper src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png" desc="示意图" />
+        <ImageWrapper
+          src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png"
+          desc="示意图"
+        />
       </PageHeaderLayout>
     );
   }

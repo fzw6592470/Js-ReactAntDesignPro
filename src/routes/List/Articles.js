@@ -43,7 +43,6 @@ export default class SearchList extends Component {
     const { getFieldDecorator } = form;
 
     const owners = [
-
       {
         id: 'wzj',
         name: '我自己',
@@ -174,7 +173,7 @@ export default class SearchList extends Component {
                 </Col>
                 <Col xl={8} lg={10} md={12} sm={24} xs={24}>
                   <FormItem {...formItemLayout} label="好评度">
-                    {getFieldDecorator('rate', { initialValue: 'good'})(
+                    {getFieldDecorator('rate', { initialValue: 'good' })(
                       <Select
                         onChange={this.handleFormSubmit}
                         placeholder="不限"

@@ -9,6 +9,7 @@ import { format, delay } from 'roadhog-api-doc';
 import { getMemberList, operateMemberList } from './mock/memberList';
 import { getWalletList, updateWalletList } from './mock/wallet';
 import { getTransRecord, getTransDetails } from './mock/transaction';
+import { menuData } from './mock/menuData';
 
 // 是否禁用代理
 const noProxy = process.env.NO_PROXY === 'true';
@@ -81,6 +82,7 @@ const proxy = {
         status: 'ok',
         type,
         currentAuthority: 'admin',
+        data: { token: 'abcdefg', expireIn: 2522162825873 },
       });
       return;
     }
@@ -89,6 +91,7 @@ const proxy = {
         status: 'ok',
         type,
         currentAuthority: 'user',
+        data: { token: 'abcdefg', expireIn: 2522162825873 },
       });
       return;
     }
@@ -96,7 +99,8 @@ const proxy = {
       res.send({
         status: 'ok',
         type,
-        currentAuthority: 'cuigl'
+        currentAuthority: 'cuigl',
+        data: { token: 'abcdefg', expireIn: 2522162825873 },
       });
       return;
     }
@@ -168,6 +172,7 @@ const proxy = {
   },
   'GET /api/transaction/record': getTransRecord,
   'GET /api/transaction/details': getTransDetails,
+  'GET /api/menuData': menuData,
 };
 
 export default (noProxy ? {} : delay(proxy, 1000));

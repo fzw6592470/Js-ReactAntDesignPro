@@ -95,7 +95,13 @@ export function digitUppercase(n) {
     .replace(/(零.)+/g, '零')
     .replace(/^整$/, '零元整');
 }
-
+/**
+ * @description 比较两个路径是否存在包含关系，输出3就是不包含
+ * @param {String} str1 => '/list/search'
+ * @param {String} str2 => '/list/search/item'
+ * @return => 2
+ *
+ */
 function getRelation(str1, str2) {
   if (str1 === str2) {
     console.warn('Two path are equal!'); // eslint-disable-line
@@ -109,7 +115,10 @@ function getRelation(str1, str2) {
   }
   return 3;
 }
-
+/**
+ * @description 筛选path，只保留二级菜单的path
+ * @param {Array} routes 所有经过 path.replace('/', '')处理后的path路径
+ */
 function getRenderArr(routes) {
   let renderArr = [];
   renderArr.push(routes[0]);
@@ -117,7 +126,7 @@ function getRenderArr(routes) {
     let isAdd = false;
     // 是否包含
     isAdd = renderArr.every(item => getRelation(item, routes[i]) === 3);
-    // 去重
+    // 去重  =>去掉item.indexOf(routes[i]) === 0 的元素
     renderArr = renderArr.filter(item => getRelation(item, routes[i]) !== 1);
     if (isAdd) {
       renderArr.push(routes[i]);
@@ -133,16 +142,27 @@ function getRenderArr(routes) {
  * @param {routerData} routerData
  */
 export function getRoutes(path, routerData) {
+ // 过滤掉根目录 /和没有/的路径
   let routes = Object.keys(routerData).filter(
     routePath => routePath.indexOf(path) === 0 && routePath !== path
   );
   // Replace path to '' eg. path='user' /user/name => name
   routes = routes.map(item => item.replace(path, ''));
   // Get the route to be rendered to remove the deep rendering
+  /* 获取要呈现的路径以移除深绘制（路径） */
   const renderArr = getRenderArr(routes);
-  // Conversion and stitching parameters
   const renderRoutes = renderArr.map(item => {
-    const exact = !routes.some(route => route !== item && getRelation(route, item) === 1);
+    /**
+     * *
+     * @description 判断是否item有被过滤掉的子元素  list => 'list/search'
+     * 有 => !true => false
+     * 无 => !false => true
+     *
+     */
+    const exact = !routes.some(route => {
+    	// item是否存在于routes中,而且不相等  =>list/search.indexOf('/list');
+    	return route !== item && getRelation(route, item) === 1;
+    });
     return {
       exact,
       ...routerData[`${path}${item}`],
@@ -152,6 +172,31 @@ export function getRoutes(path, routerData) {
   });
   return renderRoutes;
 }
+
+export function getHfRoutes(path, routerData) {
+ // 过滤掉根目录 /和没有/的路径
+  let routes = Object.keys(routerData).filter(
+    routePath => routePath.indexOf(path) === 0 && routePath !== path
+  );
+  // Replace path to '' eg. path='user' /user/name => name
+  routes = routes.map(item => item.replace(path, ''));
+  // Get the route to be rendered to remove the deep rendering
+  /* 获取要呈现的路径以移除深绘制（路径） */
+  const renderArr = getRenderArr(routes);
+  // Conversion and stitching parameters
+  const renderRoutes = routes.map(item => {
+//  const exact = !routes.some(route => route !== item && getRelation(route, item) === 1);
+    const exact = true;
+    return {
+      exact,
+      ...routerData[`${path}${item}`],
+      key: `${path}${item}`,
+      path: `${path}${item}`,
+    };
+  });
+  return renderRoutes;
+}
+
 
 /* eslint no-useless-escape:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/g;

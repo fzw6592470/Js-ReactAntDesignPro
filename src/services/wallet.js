@@ -9,8 +9,7 @@ export async function chargeWalletFee(params) {
     method: 'POST',
     body: {
       ...params,
-      method: 'charge'
-    }
+      method: 'charge',
+    },
   });
 }
-

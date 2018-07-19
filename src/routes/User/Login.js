@@ -21,6 +21,8 @@ export default class LoginPage extends Component {
     this.setState({ type });
   };
 
+  onGetCaptcha = () => {};
+
   handleSubmit = (err, values) => {
     const { type } = this.state;
     if (!err) {
@@ -32,10 +34,6 @@ export default class LoginPage extends Component {
         },
       });
     }
-  };
-
-  onGetCaptcha = e => {
-    console.log("获取验证码.");
   };
 
   changeAutoLogin = e => {

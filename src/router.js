@@ -3,9 +3,10 @@ import { routerRedux, Route, Switch } from 'dva/router';
 import { LocaleProvider, Spin } from 'antd';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 import dynamic from 'dva/dynamic';
-import { getRouterData } from './common/router';
+import { getRouterConfig } from './common/router';
 import Authorized from './utils/Authorized';
 import styles from './index.less';
+import { hasPermission } from './utils/authority';
 
 const { ConnectedRouter } = routerRedux;
 const { AuthorizedRoute } = Authorized;
@@ -14,9 +15,9 @@ dynamic.setDefaultLoadingComponent(() => {
 });
 
 function RouterConfig({ history, app }) {
-  const routerData = getRouterData(app);
-  const UserLayout = routerData['/user'].component;
-  const BasicLayout = routerData['/'].component;
+  const routerConfig = getRouterConfig(app);
+  const UserLayout = routerConfig['/user'].component;
+  const BasicLayout = routerConfig['/'].component;
   return (
     <LocaleProvider locale={zhCN}>
       <ConnectedRouter history={history}>
@@ -25,7 +26,7 @@ function RouterConfig({ history, app }) {
           <AuthorizedRoute
             path="/"
             render={props => <BasicLayout {...props} />}
-            //authority={['admin', 'user', 'cuigl']}
+            authority={() => hasPermission('root')}
             redirectPath="/user/login"
           />
         </Switch>

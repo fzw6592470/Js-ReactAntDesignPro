@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
 import {
@@ -11,22 +11,16 @@ import {
   Icon,
   Table,
   Button,
-  Dropdown,
-  Menu,
-  InputNumber,
   DatePicker,
   Modal,
   message,
   Badge,
-  Divider,
 } from 'antd';
-import StandardTable from 'components/StandardTable';
-import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import ImageWrapper from 'components/ImageWrapper';
-import { checkTelphoneNumber, checkPasswordNumber } from '../../utils/formValidate';
+import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import { checkTelphoneNumber } from '../../utils/formValidate';
 
 import styles from '../List/TableList.less';
-import memberStyles from './MemberList.less';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -38,80 +32,75 @@ const statusMap = ['default', 'enable', 'disable'];
 const status = ['关闭', '启用', '禁用'];
 
 const CreateForm = Form.create()(props => {
-  const { modalVisible, handleModalVisible, record, loading  } = props;
-  const columns = [{
-    title: '充值时间',
-    dataIndex: 'time',
-    render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
-  },{
-    title: '充值费用(元)',
-    dataIndex: 'fee',
-  },{
-    title: '支付方式',
-    dataIndex: 'type',
-    render(val) {
-      return val==1?'微信支付':val==2?'支付宝支付':'银联支付';
-    }
-  }];
+  const { modalVisible, handleModalVisible, records, loading } = props;
+  const columns = [
+    {
+      title: '充值时间',
+      dataIndex: 'time',
+      render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
+    },
+    {
+      title: '充值费用(元)',
+      dataIndex: 'fee',
+    },
+    {
+      title: '支付方式',
+      dataIndex: 'type',
+      render(val) {
+        return val === 1 ? '微信支付' : val === 2 ? '支付宝支付' : '银联支付';
+      },
+    },
+  ];
   const closable = false;
   return (
     <Modal
       closable={closable}
       visible={modalVisible}
       onCancel={() => handleModalVisible()}
-      footer={ <Button onClick={() => handleModalVisible() }>确定</Button> }
+      footer={<Button onClick={() => handleModalVisible()}>确定</Button>}
       destroyOnClose
     >
-      <Table
-        bordered
-        rowKey="key"
-        loading={loading}
-        dataSource={record}
-        columns={columns}
-      />
+      <Table bordered rowKey="key" loading={loading} dataSource={records} columns={columns} />
     </Modal>
   );
 });
 
 const WalletChargeForm = Form.create()(props => {
-  const { chargeWalletVisible, form, handleAdd, handleChargeWalletVisible, selectRow  } = props;
+  const { chargeWalletVisible, form, handleAdd, handleChargeWalletVisible, selectRow } = props;
   const { getFieldDecorator } = form;
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       form.resetFields();
       handleAdd(fieldsValue);
-      console.log(fieldsValue);
     });
   };
 
   const checkPhone = (rule, value, callback) => {
-    console.log(value);
     if (checkTelphoneNumber(value)) {
       callback();
       return;
     }
     callback('请输入正确的11位手机号码!');
-  }
+  };
 
   const checkMoney = (rule, value, callback) => {
-    console.log(value);
-    if(value <= 0 || value > 2000) {
+    if (value <= 0 || value > 2000) {
       callback('不能输入超过2000元！');
       return;
     }
     callback();
-  }
+  };
 
   const formItemLayout = {
-   labelCol: {
-     xs: { span: 24 },
-     sm: { span: 8 },
-   },
-   wrapperCol: {
-     xs: { span: 24 },
-     sm: { span: 16 },
-   },
+    labelCol: {
+      xs: { span: 24 },
+      sm: { span: 8 },
+    },
+    wrapperCol: {
+      xs: { span: 24 },
+      sm: { span: 16 },
+    },
   };
   return (
     <Modal
@@ -125,23 +114,37 @@ const WalletChargeForm = Form.create()(props => {
         <Row gutter={{ md: 12, lg: 24, xl: 48 }}>
           <Col md={12} sm={24}>
             <FormItem label="手机号" {...formItemLayout}>
-              {getFieldDecorator('mobNo', { initialValue: selectRow?selectRow.mobNo:"", rules: [{ validator: checkPhone },{ required: true, message: '请填写您的手机号!' },]  })(<Input placeholder="请输入账号" maxLength="11" />)}
+              {getFieldDecorator('mobNo', {
+                initialValue: selectRow ? selectRow.mobNo : '',
+                rules: [
+                  { validator: checkPhone },
+                  { required: true, message: '请填写您的手机号!' },
+                ],
+              })(<Input placeholder="请输入账号" maxLength="11" />)}
             </FormItem>
           </Col>
           <Col md={12} sm={24}>
             <FormItem label="充值金额" {...formItemLayout}>
-              {getFieldDecorator('fee',{ initialValue: "", rules: [{ validator: checkMoney }, { required: true, message: '请填写需要充值的金额！' }] })(<Input placeholder="请输入充值金额(元)" maxLength='6' />)}
+              {getFieldDecorator('fee', {
+                initialValue: '',
+                rules: [
+                  { validator: checkMoney },
+                  { required: true, message: '请填写需要充值的金额！' },
+                ],
+              })(<Input placeholder="请输入充值金额(元)" maxLength="6" />)}
             </FormItem>
           </Col>
         </Row>
-        {getFieldDecorator('key',{ initialValue: selectRow?selectRow.key:""})(<Input type="hidden" />)}
-        {getFieldDecorator('userId',{ initialValue: selectRow?selectRow.userId:""})(<Input type="hidden" />)}
+        {getFieldDecorator('key', { initialValue: selectRow ? selectRow.key : '' })(
+          <Input type="hidden" />
+        )}
+        {getFieldDecorator('userId', { initialValue: selectRow ? selectRow.userId : '' })(
+          <Input type="hidden" />
+        )}
       </Form>
     </Modal>
   );
 });
-
-
 
 @connect(({ wallet, loading }) => ({
   wallet,
@@ -152,7 +155,6 @@ export default class Wallet extends PureComponent {
   state = {
     modalVisible: false,
     chargeWalletVisible: false,
-    expandForm: false,
     record: [],
     formValues: {},
     selectRow: {},
@@ -200,12 +202,6 @@ export default class Wallet extends PureComponent {
     dispatch({
       type: 'wallet/fetch',
       payload: {},
-    });
-  };
-
-  toggleForm = () => {
-    this.setState({
-      expandForm: !this.state.expandForm,
     });
   };
 
@@ -262,24 +258,24 @@ export default class Wallet extends PureComponent {
     });
   };
 
-  showChargeRecord = record => {
-    if(!record) {
-      message.error("没有充值记录。");
+  showChargeRecord = records => {
+    if (!records) {
+      message.error('没有充值记录。');
       return;
-    };
+    }
 
     this.setState({
       modalVisible: true,
-      record: record,
+      record: records,
     });
-  }
+  };
 
   showChargeForm = row => {
     this.setState({
       chargeWalletVisible: true,
       selectRow: row,
     });
-  }
+  };
 
   renderSimpleForm() {
     const { getFieldDecorator } = this.props.form;
@@ -364,15 +360,14 @@ export default class Wallet extends PureComponent {
   }
 
   renderForm() {
-    //return this.state.expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
     return this.renderSimpleForm();
   }
 
   render() {
-    let self = this;
+    const self = this;
     const { wallet, loading } = this.props;
     const { record, selectRow, modalVisible, chargeWalletVisible } = this.state;
-    const { data } =  wallet ;
+    const { data } = wallet;
 
     const columns = [
       {
@@ -386,11 +381,6 @@ export default class Wallet extends PureComponent {
       {
         title: '昵称',
         dataIndex: 'nickName',
-        //sorter: true,
-        //align: 'right',
-        //render: val => `${val} 万`,
-        // mark to display a total number
-        //needTotal: true,
       },
       {
         title: '注册时间',
@@ -401,8 +391,6 @@ export default class Wallet extends PureComponent {
       {
         title: '当前余额(元)',
         dataIndex: 'balance',
-        //sorter: true,
-        //render: val => <span>{val}</span>,
       },
       {
         title: '状态',
@@ -421,7 +409,7 @@ export default class Wallet extends PureComponent {
             value: 2,
           },
         ],
-        onFilter: (value, record) => record.status.toString() === value,
+        onFilter: (value, records) => records.status.toString() === value,
         render(val) {
           return <Badge status={statusMap[val]} text={status[val]} />;
         },
@@ -431,25 +419,32 @@ export default class Wallet extends PureComponent {
         dataIndex: 'chargeRecord',
         sorter: true,
         render(val) {
-          console.log(val);
-          return <Button onClick={function (){self.showChargeRecord(val);}}>查看</Button>;
+          return (
+            <Button
+              onClick={function() {
+                self.showChargeRecord(val);
+              }}
+            >
+              查看
+            </Button>
+          );
         },
       },
       {
         title: '充值',
         dataIndex: 'isChargedabled',
-        render: (val, row, index) => (
-          <Button disabled={!val} onClick={ function() { self.showChargeForm(row); } }>充值</Button>
+        render: (val, row) => (
+          <Button
+            disabled={!val}
+            onClick={function() {
+              self.showChargeForm(row);
+            }}
+          >
+            充值
+          </Button>
         ),
       },
     ];
-
-    const menu = (
-      <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove">删除</Menu.Item>
-      //  <Menu.Item key="update">修改</Menu.Item>
-      </Menu>
-    );
 
     const parentMethods = {
       handleAdd: this.handleAdd,
@@ -457,50 +452,29 @@ export default class Wallet extends PureComponent {
       handleChargeWalletVisible: this.handleChargeWalletVisible,
     };
 
-    //const paginationProps = {
-    //  showSizeChanger: true,
-    //  showQuickJumper: true,
-    //  ...pagination,
-    //};
-            //<div className={styles.tableListOperator}>
-            //  <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-            //    新建
-            //  </Button>
-            //  {selectedRows.length > 0 && (
-            //    <span>
-            //      <Dropdown overlay={menu}>
-            //        <Button>
-            //          更多操作 <Icon type="down" />
-            //        </Button>
-            //      </Dropdown>
-            //    </span>
-            //  )}
-            //</div>
-            // <StandardTable
-            //   selectedRows={selectedRows}
-            //   loading={loading}
-            //   data={data}
-            //   columns={columns}
-            //   onSelectRow={this.handleSelectRows}
-            //   onChange={this.handleStandardTableChange}
-            // />
-
     return (
       <PageHeaderLayout>
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
-            <Table
-              bordered
-              loading={loading}
-              dataSource={data.list}
-              columns={columns}
-            />
+            <Table bordered loading={loading} dataSource={data.list} columns={columns} />
           </div>
         </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} record={record} loading={loading}  />
-        <WalletChargeForm {...parentMethods} chargeWalletVisible={chargeWalletVisible} selectRow={selectRow}   />
-        <ImageWrapper src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png" desc="示意图" />
+        <CreateForm
+          {...parentMethods}
+          modalVisible={modalVisible}
+          records={record}
+          loading={loading}
+        />
+        <WalletChargeForm
+          {...parentMethods}
+          chargeWalletVisible={chargeWalletVisible}
+          selectRow={selectRow}
+        />
+        <ImageWrapper
+          src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png"
+          desc="示意图"
+        />
       </PageHeaderLayout>
     );
   }

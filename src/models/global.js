@@ -1,4 +1,4 @@
-import { queryNotices } from '../services/api';
+import { queryNotices, getAuthMenus, getRouterData } from '../services/api';
 
 export default {
   namespace: 'global',
@@ -6,9 +6,27 @@ export default {
   state: {
     collapsed: false,
     notices: [],
+    // 存储菜单数据(全局缓存)
+    menus: [],
+    // 存储路由数据(全局缓存)
+    routerData: [],
   },
 
   effects: {
+    *fetchMenus({ payload }, { call, put, select }) { // 增加
+      const menus = yield call(getAuthMenus);
+      const routerConfig = yield select(state => state.global.routerConfig);
+      const routerData = yield call(getRouterData, routerConfig, menus);
+      yield put({
+        type: 'saveMenus',
+        payload: menus,
+      });
+
+      yield put({
+        type: 'saveRouterData',
+        payload: routerData,
+      });
+     },
     *fetchNotices(_, { call, put }) {
       const data = yield call(queryNotices);
       yield put({
@@ -52,6 +70,24 @@ export default {
         notices: state.notices.filter(item => item.type !== payload),
       };
     },
+    saveMenus(state, { payload }) {
+      return {
+        ...state,
+        menus: payload,
+      };
+    },
+    saveRouterConfig(state, { payload }) {
+      return {
+        ...state,
+        routerConfig: payload,
+      };
+    },
+    saveRouterData(state, { payload }) {
+      return {
+        ...state,
+        routerData: payload,
+      };
+    }
   },
 
   subscriptions: {
